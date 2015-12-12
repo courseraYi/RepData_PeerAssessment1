@@ -1,29 +1,17 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 
 
-```{r loadlibrary, echo=FALSE, message=FALSE}
-library(knitr)
-library(dplyr)
-library(ggplot2)
-library(xtable)
-library(lubridate)
-```
 
-```{r setoptions,echo=FALSE}
-opts_chunk$set(echo=TRUE)
-```
+
+
 
 
 ## Loading and preprocessing the data
 1. Load the data
 
 The raw file is in CSV format, so `read.csv` function will be used for loading the data.
-```{r loaddata}
+
+```r
 act <- read.csv("activity.csv")
 ```
 

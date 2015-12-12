@@ -75,7 +75,43 @@ print(xt, type="html")
 
 
 ## Imputing missing values
+1. Calculate the total number of missing valuse
+```{r}
+act.na <- act %>% filter(is.na(steps)) %>% summarise(number=n())
+```
+The total number of missing values in the dataset (the total number of rows with NAs) is: `r act.na$number`.
 
+2. Strategy for filling in missing values
+
+Beacuse the missing values are always for a whole day, **the mean/median for that** will not be suitable. Finally, the **mean for that 5-minute interval** (rounded to the integer) will be used to fill in all of the missing values in the dataset.
+
+3. Fill in the missing values
+
+Create a new dataset that is equal to the original dataset but with the missing data filled in. The column named **step.new** is added.
+```{r}
+act.new <- act %>% group_by(interval) %>% mutate(steps.new=round(ifelse(is.na(steps), mean(steps, na.rm = TRUE), steps)))
+```
+
+4. Make the histogram and calculate the mean and median
+
+* Make the histogram
+```{r message=FALSE}
+act.new.total <- act.new %>% group_by(date) %>% summarise(total=sum(steps.new))
+ph2 <- ggplot(act.new.total, aes(x=total)) + geom_histogram()
+ph2 <- ph2 + labs(x="Total number of steps taken each day", y="Count")
+ph2
+```
+
+* Calculate the mean and median
+```{r results="asis"}
+act.new.mm <- act.new %>% group_by(date) %>% summarise(mean=mean(steps.new), median=median(steps.new))
+xt <- xtable(act.new.mm)
+print(xt, type="html")
+```
+
+* The impact of imputing missing data
+
+After imputting the missing data, the histogram has changed slightly, for example, the max count at the y-axis and the shape at the middle of the x-axis (around 11000). Besides, which can be seen in the **mean** and **median** table, the number of rows (days) has been changed from `r nrow(act.total)` to `r nrow(act.new.total)`. The **mean** and **median** for days without missing data has not been changed, but those for days with missing data has been added.
 
 
 ## Are there differences in activity patterns between weekdays and weekends?

@@ -45,7 +45,7 @@ print(xt, type="html")
 ```
 
 <!-- html table generated in R 3.2.3 by xtable 1.8-0 package -->
-<!-- Sat Dec 12 11:52:25 2015 -->
+<!-- Sat Dec 12 11:53:07 2015 -->
 <table border=1>
 <tr> <th>  </th> <th> date </th> <th> mean </th> <th> median </th>  </tr>
   <tr> <td align="right"> 1 </td> <td> 2012-10-02 </td> <td align="right"> 0.44 </td> <td align="right"> 0.00 </td> </tr>
@@ -129,7 +129,7 @@ print(xt, type="html")
 ```
 
 <!-- html table generated in R 3.2.3 by xtable 1.8-0 package -->
-<!-- Sat Dec 12 11:52:25 2015 -->
+<!-- Sat Dec 12 11:53:07 2015 -->
 <table border=1>
 <tr> <th>  </th> <th> interval </th> <th> ave </th>  </tr>
   <tr> <td align="right"> 1 </td> <td align="right"> 835 </td> <td align="right"> 206.17 </td> </tr>
@@ -178,7 +178,7 @@ print(xt, type="html")
 ```
 
 <!-- html table generated in R 3.2.3 by xtable 1.8-0 package -->
-<!-- Sat Dec 12 11:52:25 2015 -->
+<!-- Sat Dec 12 11:53:07 2015 -->
 <table border=1>
 <tr> <th>  </th> <th> date </th> <th> mean </th> <th> median </th>  </tr>
   <tr> <td align="right"> 1 </td> <td> 2012-10-01 </td> <td align="right"> 37.37 </td> <td align="right"> 34.50 </td> </tr>
@@ -250,3 +250,23 @@ After imputting the missing data, the histogram has changed slightly, for exampl
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
+1. Create a new factor variable
+
+The week begins from Monday(1) to Sunday(7), which can be seen at column named **week.num**. And **weekday** equals 1-5, **weekend** equals 6-7, which can be seen at column named **week**.
+
+```r
+act.week <- act.new %>% mutate(week.num=ifelse(wday(as.Date(date))==1,7,wday(as.Date(date))-1)) %>% mutate(week=as.factor(ifelse(week.num<=5,"weekday", "weekend")))
+```
+
+2. Make a panel plot
+The panel plot containing a time series plot of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis), is shown as:
+
+```r
+act.week.ave <- act.week %>% group_by(interval, week) %>% summarise(ave=mean(steps.new))
+pt2 <- ggplot(act.week.ave, aes(x=interval, y=ave)) + geom_line()
+pt2 <- pt2 + facet_wrap(~week, nrow=2)
+pt2 <- pt2 + labs(x="5-minute interval", y="Average number of steps")
+pt2
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-10-1.png) 

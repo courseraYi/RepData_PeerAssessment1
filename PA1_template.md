@@ -45,7 +45,7 @@ print(xt, type="html")
 ```
 
 <!-- html table generated in R 3.2.3 by xtable 1.8-0 package -->
-<!-- Sat Dec 12 11:50:04 2015 -->
+<!-- Sat Dec 12 11:51:30 2015 -->
 <table border=1>
 <tr> <th>  </th> <th> date </th> <th> mean </th> <th> median </th>  </tr>
   <tr> <td align="right"> 1 </td> <td> 2012-10-02 </td> <td align="right"> 0.44 </td> <td align="right"> 0.00 </td> </tr>
@@ -105,7 +105,35 @@ print(xt, type="html")
 
 
 ## What is the average daily activity pattern?
+1. Make the time series plot
 
+The time series plot ot the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis), is shown as:
+
+```r
+act.ave <- act %>% filter(!is.na(steps)) %>% group_by(interval) %>% summarise(ave=mean(steps))
+pt <- ggplot(act.ave, aes(x=interval, y=ave)) + geom_line()
+pt <- pt + labs(x="5-minute interval", y="Average number of steps")
+pt
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-3-1.png) 
+
+2. Find the maximum
+
+The 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps, is:
+
+```r
+act.ave.max <- act.ave %>% arrange(desc(ave)) %>% top_n(1)
+xt <- xtable(act.ave.max)
+print(xt, type="html")
+```
+
+<!-- html table generated in R 3.2.3 by xtable 1.8-0 package -->
+<!-- Sat Dec 12 11:51:31 2015 -->
+<table border=1>
+<tr> <th>  </th> <th> interval </th> <th> ave </th>  </tr>
+  <tr> <td align="right"> 1 </td> <td align="right"> 835 </td> <td align="right"> 206.17 </td> </tr>
+   </table>
 
 
 ## Imputing missing values

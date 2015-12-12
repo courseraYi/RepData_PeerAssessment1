@@ -7,45 +7,44 @@
 
 
 ## Loading and preprocessing the data
-1. Load the data
-
+### Load the data
 The raw file is in CSV format, so `read.csv` function will be used for loading the data.
 
 ```r
 act <- read.csv("activity.csv")
 ```
-
-2. Preprocess the data
-
+### Preprocess the data
 The data has been in long-format, so I think that it isn't needed to preprocess the data any more.
 
 
 ## What is mean total number of steps taken per day?
-1. Make the histogram
-
+### Make the histogram
 The histogram of the total number of steps taken each day is shown as:
 
 ```r
-act.total <- act %>% filter(!is.na(steps)) %>% group_by(date) %>% summarise(total=sum(steps))
-ph <- ggplot(act.total, aes(x=total)) + geom_histogram()
-ph <- ph + labs(x="Total number of steps taken each day", y="Count")
+act.total <-
+    act %>% filter(!is.na(steps)) %>% group_by(date) %>% summarise(total =
+    sum(steps))
+ph <- ggplot(act.total, aes(x = total)) + geom_histogram()
+ph <- ph + labs(x = "Total number of steps taken each day", y = "Count")
 ph
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-1-1.png) 
 
-2. Calculate the mean and median
-
+### Calculate the mean and median
 The **mean** and **median** total number of steps taken per day is shown as:
 
 ```r
-act.mm <- act %>% filter(!is.na(steps)) %>% group_by(date) %>% summarise(mean=mean(steps), median=median(steps))
+act.mm <-
+    act %>% filter(!is.na(steps)) %>% group_by(date) %>% summarise(mean = mean(steps), median =
+    median(steps))
 xt <- xtable(act.mm)
-print(xt, type="html")
+print(xt, type = "html")
 ```
 
 <!-- html table generated in R 3.2.3 by xtable 1.8-0 package -->
-<!-- Sat Dec 12 11:53:07 2015 -->
+<!-- Sat Dec 12 12:01:12 2015 -->
 <table border=1>
 <tr> <th>  </th> <th> date </th> <th> mean </th> <th> median </th>  </tr>
   <tr> <td align="right"> 1 </td> <td> 2012-10-02 </td> <td align="right"> 0.44 </td> <td align="right"> 0.00 </td> </tr>
@@ -105,31 +104,31 @@ print(xt, type="html")
 
 
 ## What is the average daily activity pattern?
-1. Make the time series plot
-
+### Make the time series plot
 The time series plot ot the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis), is shown as:
 
 ```r
-act.ave <- act %>% filter(!is.na(steps)) %>% group_by(interval) %>% summarise(ave=mean(steps))
-pt <- ggplot(act.ave, aes(x=interval, y=ave)) + geom_line()
-pt <- pt + labs(x="5-minute interval", y="Average number of steps")
+act.ave <-
+    act %>% filter(!is.na(steps)) %>% group_by(interval) %>% summarise(ave =
+    mean(steps))
+pt <- ggplot(act.ave, aes(x = interval, y = ave)) + geom_line()
+pt <- pt + labs(x = "5-minute interval", y = "Average number of steps")
 pt
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-3-1.png) 
 
-2. Find the maximum
-
+### Find the maximum
 The 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps, is:
 
 ```r
 act.ave.max <- act.ave %>% arrange(desc(ave)) %>% top_n(1)
 xt <- xtable(act.ave.max)
-print(xt, type="html")
+print(xt, type = "html")
 ```
 
 <!-- html table generated in R 3.2.3 by xtable 1.8-0 package -->
-<!-- Sat Dec 12 11:53:07 2015 -->
+<!-- Sat Dec 12 12:01:12 2015 -->
 <table border=1>
 <tr> <th>  </th> <th> interval </th> <th> ave </th>  </tr>
   <tr> <td align="right"> 1 </td> <td align="right"> 835 </td> <td align="right"> 206.17 </td> </tr>
@@ -137,48 +136,51 @@ print(xt, type="html")
 
 
 ## Imputing missing values
-1. Calculate the total number of missing valuse
+### Calculate the total number of missing valuse
 
 ```r
-act.na <- act %>% filter(is.na(steps)) %>% summarise(number=n())
+act.na <- act %>% filter(is.na(steps)) %>% summarise(number = n())
 ```
 The total number of missing values in the dataset (the total number of rows with NAs) is: 2304.
 
-2. Strategy for filling in missing values
+### Strategy for filling in missing values
+Beacuse the missing values are always for a whole day, **the mean/median for that day** will not be suitable. Finally, the **mean for that 5-minute interval** (rounded to the integer) will be used to fill in all of the missing values in the dataset.
 
-Beacuse the missing values are always for a whole day, **the mean/median for that** will not be suitable. Finally, the **mean for that 5-minute interval** (rounded to the integer) will be used to fill in all of the missing values in the dataset.
-
-3. Fill in the missing values
-
+### Fill in the missing values
 Create a new dataset that is equal to the original dataset but with the missing data filled in. The column named **step.new** is added.
 
 ```r
-act.new <- act %>% group_by(interval) %>% mutate(steps.new=round(ifelse(is.na(steps), mean(steps, na.rm = TRUE), steps)))
+act.new <-
+    act %>% group_by(interval) %>% mutate(steps.new = round(ifelse(
+    is.na(steps), mean(steps, na.rm = TRUE), steps
+    )))
 ```
-
-4. Make the histogram and calculate the mean and median
-
-* Make the histogram
+### Make the histogram and calculate the mean and median
+#### Make the histogram
 
 ```r
-act.new.total <- act.new %>% group_by(date) %>% summarise(total=sum(steps.new))
-ph2 <- ggplot(act.new.total, aes(x=total)) + geom_histogram()
-ph2 <- ph2 + labs(x="Total number of steps taken each day", y="Count")
+act.new.total <-
+    act.new %>% group_by(date) %>% summarise(total = sum(steps.new))
+ph2 <- ggplot(act.new.total, aes(x = total)) + geom_histogram()
+ph2 <-
+    ph2 + labs(x = "Total number of steps taken each day", y = "Count")
 ph2
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-7-1.png) 
 
-* Calculate the mean and median
+#### Calculate the mean and median
 
 ```r
-act.new.mm <- act.new %>% group_by(date) %>% summarise(mean=mean(steps.new), median=median(steps.new))
+act.new.mm <-
+    act.new %>% group_by(date) %>% summarise(mean = mean(steps.new), median =
+    median(steps.new))
 xt <- xtable(act.new.mm)
-print(xt, type="html")
+print(xt, type = "html")
 ```
 
 <!-- html table generated in R 3.2.3 by xtable 1.8-0 package -->
-<!-- Sat Dec 12 11:53:07 2015 -->
+<!-- Sat Dec 12 12:01:12 2015 -->
 <table border=1>
 <tr> <th>  </th> <th> date </th> <th> mean </th> <th> median </th>  </tr>
   <tr> <td align="right"> 1 </td> <td> 2012-10-01 </td> <td align="right"> 37.37 </td> <td align="right"> 34.50 </td> </tr>
@@ -244,29 +246,31 @@ print(xt, type="html")
   <tr> <td align="right"> 61 </td> <td> 2012-11-30 </td> <td align="right"> 37.37 </td> <td align="right"> 34.50 </td> </tr>
    </table>
 
-* The impact of imputing missing data
-
+#### The impact of imputing missing data
 After imputting the missing data, the histogram has changed slightly, for example, the max count at the y-axis and the shape at the middle of the x-axis (around 11000). Besides, which can be seen in the **mean** and **median** table, the number of rows (days) has been changed from 53 to 61. The **mean** and **median** for days without missing data has not been changed, but those for days with missing data has been added.
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
-1. Create a new factor variable
-
+### Create a new factor variable
 The week begins from Monday(1) to Sunday(7), which can be seen at column named **week.num**. And **weekday** equals 1-5, **weekend** equals 6-7, which can be seen at column named **week**.
 
 ```r
-act.week <- act.new %>% mutate(week.num=ifelse(wday(as.Date(date))==1,7,wday(as.Date(date))-1)) %>% mutate(week=as.factor(ifelse(week.num<=5,"weekday", "weekend")))
+act.week <-
+    act.new %>% mutate(week.num = ifelse(wday(as.Date(date)) == 1,7,wday(as.Date(date)) -
+    1)) %>% mutate(week = as.factor(ifelse(week.num <= 5,"weekday", "weekend")))
 ```
-
-2. Make a panel plot
+### Make a panel plot
 The panel plot containing a time series plot of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis), is shown as:
 
 ```r
-act.week.ave <- act.week %>% group_by(interval, week) %>% summarise(ave=mean(steps.new))
-pt2 <- ggplot(act.week.ave, aes(x=interval, y=ave)) + geom_line()
-pt2 <- pt2 + facet_wrap(~week, nrow=2)
-pt2 <- pt2 + labs(x="5-minute interval", y="Average number of steps")
+act.week.ave <-
+    act.week %>% group_by(interval, week) %>% summarise(ave = mean(steps.new))
+pt2 <- ggplot(act.week.ave, aes(x = interval, y = ave)) + geom_line()
+pt2 <- pt2 + facet_wrap( ~ week, nrow = 2)
+pt2 <-
+    pt2 + labs(x = "5-minute interval", y = "Average number of steps")
 pt2
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-10-1.png) 
+
